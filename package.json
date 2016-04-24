@@ -1,26 +1,57 @@
 {
-	"name": "vscode-mocha",
-	"displayName": "Mocha",
-	"description": "Runs Mocha tests",
-	"version": "0.0.1",
-	"publisher": "Compulim",
-	"engines": {
-		"vscode": "^0.10.1"
-	},
-	"categories": [
-		"Other"
-	],
-	"activationEvents": [
-		"onCommand:extension.sayHello"
-	],
-	"main": "./extension",
-	"contributes": {
-		"commands": [{
-			"command": "extension.sayHello",
-			"title": "Hello World"
-		}]
-	},
-	"devDependencies": {
-		"vscode": "0.10.x"
-	}
+  "name": "vscode-mocha",
+  "displayName": "Mocha",
+  "description": "Runs Mocha tests",
+  "version": "0.0.1",
+  "publisher": "Compulim",
+  "engines": {
+    "vscode": "^0.10.1"
+  },
+  "icon": "icon.png",
+  "galleryBanner.color": "#8A6343",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/compulim/vscode-mocha.git"
+  },
+  "bugs": "https://github.com/compulim/vscode-mocha/issues/",
+  "homepage": "https://github.com/compulim/vscode-mocha/blob/master/README.md",
+  "keywords": [
+    "assert",
+    "bdd",
+    "mocha",
+    "tdd",
+    "test",
+    "testing",
+    "unit test",
+    "unittest"
+  ],
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:mocha.runAllTests",
+    "onCommand:mocha.runSelectedTest"
+  ],
+  "main": "./extension",
+  "contributes": {
+    "commands": [
+      {
+        "command": "mocha.runAllTests",
+        "title": "Mocha: Run all tests"
+      },
+      {
+        "command": "mocha.runSelectedTest",
+        "title": "Mocha: Run selected test"
+      }
+    ]
+  },
+  "devDependencies": {
+    "vscode": "0.11.x"
+  },
+  "dependencies": {
+    "bluebird": "^3.3.5",
+    "escape-regexp": "0.0.1",
+    "glob": "^7.0.3",
+    "mocha": "^2.4.5"
+  }
 }
