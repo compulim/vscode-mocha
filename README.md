@@ -1,13 +1,43 @@
-# README
-## This is the README for your extension "vscode-mocha" 
-You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
+# Mocha
+Runs Mocha tests, all or selected. Then prints the result to an output window.
 
-* Split the editor (`Cmd+\` on OSX or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on OSX or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (OSX) to see a list of Markdown snippets
+![Demo showing Mocha test result](https://raw.githubusercontent.com/compulim/vscode-mocha/master/demo.png)
 
-### For more information
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+## Usage
+To run Mocha tests:
+* Bring up Command Palette (`F1`, or `Ctrl+Shift+P` on Windows and Linux, or `Shift+CMD+P` on OSX)
+* Type or select "Mocha: Run all tests"
 
-** Enjoy!**
+You can also create keyboard shortcut with JSON below.
+```
+{
+  "key": "ctrl+k r",
+  "command": "mocha.runAllTests"
+}
+```
+
+## How it works
+This extensions finds and runs all test at `test/**/*.js`.
+
+All tests will run under installed Node.js as indicated by environmental variable `PATH`.
+
+## Configure Mocha
+To configure Mocha, you can set it under File > Preferences > Workspace Settings. For example, the following JSON will set your Mocha to run in TDD mode.
+```
+{
+  "mocha.options": {
+    "ui": "tdd"
+  }
+}
+```
+
+## Change log
+* 0.0.1 (2016-04-25)
+  * First public release
+
+## Contributions
+Love this extension? [Star](https://github.com/compulim/vscode-mocha/stargazers) us!
+
+Want to make this extension even more awesome? [Send us your wish](https://github.com/compulim/vscode-mocha/issues/new/).
+
+Hate how it is working? [File an issue](https://github.com/compulim/vscode-mocha/issues/new/) to us.

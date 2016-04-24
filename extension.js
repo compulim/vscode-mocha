@@ -91,7 +91,13 @@ function findNodeJSPath() {
 function runMocha(rootPath, testFiles, name) {
   return fork(
     path.resolve(module.filename, '../worker/runtest.js'),
-    [ rootPath, JSON.stringify(testFiles) ].concat(name ? [ name ] : [])
+    [
+      JSON.stringify({
+        files: testFiles,
+        options: vscode.workspace.getConfiguration('mocha').options,
+        grep: name
+      })
+    ]
   ).then(process => new Promise((resolve, reject) => {
     const outputChannel = vscode.window.createOutputChannel('Mocha');
 

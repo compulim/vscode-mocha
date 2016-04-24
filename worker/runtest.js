@@ -8,24 +8,13 @@ const
   Promise = require('bluebird');
 
 const
-  optionsFilename = path.resolve(process.argv[2], 'test/mocha.json'),
-  readFile = Promise.promisify(fs.readFile);
+  args = JSON.parse(process.argv[2]),
+  options = args.options;
 
-let options;
-
-try {
-  options = require(optionsFilename);
-} catch (ex) {
-  if (ex.code !== 'MODULE_NOT_FOUND') {
-    console.error(ex);
-    process.exit(-1);
-  }
-}
-
-if (options) {
-  console.log(`Applying Mocha options from ${optionsFilename}\n${indent(JSON.stringify(options, null, 2))}:`);
+if (Object.keys(options || {}).length) {
+  console.log(`Applying Mocha options:\n${indent(JSON.stringify(options, null, 2))}`);
 } else {
-  console.log(`No Mocha options are configured. You can set it at ${optionsFilename}`);
+  console.log(`No Mocha options are configured. You can set it under File > Preferences > Workspace Settings.`);
 }
 
 const mocha = new Mocha(options);
@@ -33,12 +22,12 @@ const mocha = new Mocha(options);
 console.log();
 console.log('Test file(s):');
 
-JSON.parse(process.argv[3]).forEach(file => {
+args.files.forEach(file => {
   console.log(`  ${file}`);
   mocha.addFile(file);
 });
 
-const grep = process.argv[4];
+const grep = args.grep;
 
 grep && mocha.grep(new RegExp(`^${escapeRegExp(grep)}$`));
 

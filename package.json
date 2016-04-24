@@ -43,7 +43,17 @@
         "command": "mocha.runSelectedTest",
         "title": "Mocha: Run selected test"
       }
-    ]
+    ],
+    "configuration": {
+      "type": "object",
+      "title": "Mocha options",
+      "properties": {
+        "mocha.options": {
+          "default": {},
+          "description": "Mocha: Options to run Mocha"
+        }
+      }
+    }
   },
   "devDependencies": {
     "vscode": "0.11.x"
