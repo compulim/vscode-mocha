@@ -1,6 +1,7 @@
 'use strict';
 
 const
+  CustomReporter = require('./customreporter'),
   escapeRegExp = require('escape-regexp'),
   fs = require('fs'),
   Mocha = require('mocha'),
@@ -30,6 +31,7 @@ args.files.forEach(file => {
 const grep = args.grep;
 
 grep && mocha.grep(new RegExp(`^${escapeRegExp(grep)}$`));
+mocha.reporter(CustomReporter);
 
 mocha.run(code => {
   process.exit(code);
@@ -37,4 +39,7 @@ mocha.run(code => {
 
 function indent(lines) {
   return lines.split('\n').map(line => `  ${line}`).join('\n');
+}
+
+function initReporters() {
 }

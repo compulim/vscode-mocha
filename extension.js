@@ -14,6 +14,8 @@ const
 const
   access = Promise.promisify(fs.access);
 
+let lastRunResult;
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -101,15 +103,15 @@ function runMocha(rootPath, testFiles, name) {
   ).then(process => new Promise((resolve, reject) => {
     const outputChannel = vscode.window.createOutputChannel('Mocha');
 
-    let stdout = '';
-
     outputChannel.clear();
     outputChannel.show();
 
     outputChannel.appendLine(`Running Mocha with Node.js at ${process.spawnfile}\n`);
 
+    const resultJSONText = [];
+
     process.stderr.on('data', data => {
-      outputChannel.append(data.toString().replace(/\r/g, ''));
+      resultJSONText.push(data);
     });
 
     process.stdout.on('data', data => {
@@ -119,10 +121,11 @@ function runMocha(rootPath, testFiles, name) {
     process.on('error', err => {
       vscode.window.showErrorMessage(`Failed to run test due to ${err.message}`);
       outputChannel.append(err.stack);
+      reject(err);
     });
 
     process.on('exit', () => {
-      outputChannel.append(stdout);
+      resolve(JSON.parse(Buffer.concat(resultJSONText).toString()));
     });
   }));
 }
@@ -137,7 +140,13 @@ function runAllTests() {
       runMocha(
         rootPath,
         files.map(file => path.resolve(rootPath, file))
-      ).then(() => resolve(), err => reject(err));
+      ).then(
+        result => {
+          lastRunResult = result;
+          resolve();
+        },
+        err => reject(err)
+      );
     });
   });
 }
@@ -167,6 +176,14 @@ function selectAndRunTest() {
       const test = entry.test;
 
       runMocha(rootPath, [ test.filename ], test.name)
+        .then(
+          result => {
+            lastRunResult = result;
+          },
+          err => {
+            vscode.window.showErrorMessage(`Failed to run tests due to ${err.message}`);
+          }
+        )
     }
   });
 }
