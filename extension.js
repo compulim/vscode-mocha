@@ -19,12 +19,18 @@ let lastRunResult;
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
-  context.subscriptions.push(vscode.commands.registerCommand('mocha.runAllTests', function () {
+  const subscriptions = context.subscriptions;
+
+  subscriptions.push(vscode.commands.registerCommand('mocha.runAllTests', function () {
     runAllTests();
   }));
 
-  context.subscriptions.push(vscode.commands.registerCommand('mocha.selectAndRunTest', function () {
+  subscriptions.push(vscode.commands.registerCommand('mocha.selectAndRunTest', function () {
     selectAndRunTest();
+  }));
+
+  subscriptions.push(vscode.commands.registerCommand('mocha.runFailedTests', function () {
+    runFailedTests();
   }));
 }
 
@@ -108,25 +114,27 @@ function runMocha(rootPath, testFiles, name) {
 
     outputChannel.appendLine(`Running Mocha with Node.js at ${process.spawnfile}\n`);
 
-    const resultJSONText = [];
+    const resultJSONBuffers = [];
 
     process.stderr.on('data', data => {
-      resultJSONText.push(data);
+      resultJSONBuffers.push(data);
     });
 
     process.stdout.on('data', data => {
       outputChannel.append(data.toString().replace(/\r/g, ''));
     });
 
-    process.on('error', err => {
-      vscode.window.showErrorMessage(`Failed to run test due to ${err.message}`);
-      outputChannel.append(err.stack);
-      reject(err);
-    });
+    process
+      .on('error', err => {
+        vscode.window.showErrorMessage(`Failed to run test due to ${err.message}`);
+        outputChannel.append(err.stack);
+        reject(err);
+      })
+      .on('exit', () => {
+        const jsonText = Buffer.concat(resultJSONBuffers).toString();
 
-    process.on('exit', () => {
-      resolve(JSON.parse(Buffer.concat(resultJSONText).toString()));
-    });
+        resolve(jsonText && JSON.parse(jsonText));
+      });
   }));
 }
 
@@ -142,6 +150,7 @@ function runAllTests() {
         files.map(file => path.resolve(rootPath, file))
       ).then(
         result => {
+          console.log(result);
           lastRunResult = result;
           resolve();
         },
@@ -186,4 +195,18 @@ function selectAndRunTest() {
         )
     }
   });
+}
+
+function runFailedTests() {
+  const rootPath = vscode.workspace.rootPath;
+
+  findTests(rootPath)
+    .then(tests => {
+      console.log(tests);
+    })
+    .catch(err => {
+      vscode.window.showErrorMessage(`Failed to find tests due to ${err.message}`);
+      console.error(err);
+      throw err;
+    })
 }

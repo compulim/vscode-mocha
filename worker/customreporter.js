@@ -12,20 +12,21 @@ function Reporter(runner) {
   this._spec = new Spec(runner);
 
   const
-    suites = [],
+    suitePath = [],
     failed = [];
 
   runner
     .on('suite', suite => {
-      suites.push(suite);
+      suitePath.push(suite.fullTitle());
     })
-    .on('suit end', () => {
-      suites.pop();
+    .on('suite end', () => {
+      suitePath.pop();
     })
     .on('fail', test => {
       failed.push({
-        test: test.title,
-        suite: suite.fullTitle()
+        name: test.title,
+        suitePath: suitePath.slice(),
+        filename: test.file
       });
     })
     .on('end', () => {

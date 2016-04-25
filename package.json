@@ -30,7 +30,8 @@
   ],
   "activationEvents": [
     "onCommand:mocha.runAllTests",
-    "onCommand:mocha.selectAndRunTest"
+    "onCommand:mocha.selectAndRunTest",
+    "onCommand:mocha.runFailedTests"
   ],
   "main": "./extension",
   "contributes": {
@@ -42,6 +43,10 @@
       {
         "command": "mocha.selectAndRunTest",
         "title": "Mocha: Select and run a test"
+      },
+      {
+        "command": "mocha.runFailedTests",
+        "title": "Mocha: Run failed tests"
       }
     ],
     "configuration": {
@@ -50,7 +55,7 @@
       "properties": {
         "mocha.options": {
           "default": {},
-          "description": "Mocha: Options to run Mocha"
+         "description": "Mocha: Options to run Mocha"
         }
       }
     }

@@ -69,21 +69,30 @@ function findTests(workspaceRootPath) {
 
 function crawlTests(suite) {
   let
-    suites = [suite],
+    suites = [{ suite, path: [suite.fullTitle()] }],
     tests = [];
 
   while (suites.length) {
-    let suite = suites.shift();
+    const
+      entry = suites.shift(),
+      suite = entry.suite;
 
     tests = tests.concat(
       (suite.tests || []).map(test => ({
         name: test.fullTitle(),
-        suiteName: suite.fullTitle(),
+        suitePath: entry.path,
         filename: suite.file
       }))
     );
 
-    suites = suites.concat(suite.suites || []);
+    suites = suites.concat(
+      (suite.suites || []).map(suite => {
+        return {
+          suite,
+          path: entry.path.concat(suite.fullTitle())
+        };
+      })
+    );
   }
 
   return tests;
