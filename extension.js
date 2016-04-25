@@ -21,8 +21,8 @@ function activate(context) {
     runAllTests();
   }));
 
-  context.subscriptions.push(vscode.commands.registerCommand('mocha.runSelectedTest', function () {
-    runSelectedTest();
+  context.subscriptions.push(vscode.commands.registerCommand('mocha.selectAndRunTest', function () {
+    selectAndRunTest();
   }));
 }
 
@@ -142,7 +142,7 @@ function runAllTests() {
   });
 }
 
-function runSelectedTest() {
+function selectAndRunTest() {
   const rootPath = vscode.workspace.rootPath;
 
   vscode.window.showQuickPick(

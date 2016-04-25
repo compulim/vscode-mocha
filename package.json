@@ -30,7 +30,7 @@
   ],
   "activationEvents": [
     "onCommand:mocha.runAllTests",
-    "onCommand:mocha.runSelectedTest"
+    "onCommand:mocha.selectAndRunTest"
   ],
   "main": "./extension",
   "contributes": {
@@ -40,8 +40,8 @@
         "title": "Mocha: Run all tests"
       },
       {
-        "command": "mocha.runSelectedTest",
-        "title": "Mocha: Run selected test"
+        "command": "mocha.selectAndRunTest",
+        "title": "Mocha: Select and run a test"
       }
     ],
     "configuration": {
