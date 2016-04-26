@@ -161,21 +161,14 @@ function runMocha(testFiles, grep) {
 function runAllTests() {
   const rootPath = vscode.workspace.rootPath;
 
-  return new Promise((resolve, reject) => {
-    new Glob('test/**/*.js', { cwd: rootPath }, (err, files) => {
-      if (err) { return reject(err); }
-
-      runMocha(
-        files.map(file => path.resolve(rootPath, file))
-      ).then(
-        result => {
-          lastRunResult = result;
-          resolve();
-        },
-        err => reject(err)
-      );
-    });
-  });
+  return findAllTestFiles()
+    .then(files => runMocha(files))
+    .then(
+      result => {
+        lastRunResult = result;
+        resolve(result);
+      }
+    );
 }
 
 function selectAndRunTest() {
@@ -246,15 +239,24 @@ function trimArray(array) {
   }, []);
 }
 
+function findAllTestFiles() {
+  const rootPath = vscode.workspace.rootPath;
+
+  return new Promise((resolve, reject) => {
+    new Glob('test/**/*.js', { cwd: rootPath }, (err, files) => {
+      err ? reject(err) : resolve(files.map(file => path.resolve(rootPath, file)));
+    })
+  });
+}
+
 function runTestsByPattern() {
-  Promise.props({
+  return Promise.props({
     pattern: vscode.window.showInputBox({
       placeHolder: 'Regular expression',
       prompt: 'Pattern of tests to run',
       value: lastPattern || ''
     }),
-    filenames: findTests(vscode.workspace.rootPath)
-      .then(tests => distinctStrings(tests.map(test => test.filename)))
+    filenames: findAllTestFiles()
   }).then(props => {
     const pattern = props.pattern;
 
@@ -266,6 +268,9 @@ function runTestsByPattern() {
       props.filenames,
       props.pattern
     ).then(result => {
+      lastRunResult = result;
+
+      return result;
     });
   });
 }
