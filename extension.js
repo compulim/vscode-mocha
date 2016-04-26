@@ -67,7 +67,10 @@ function fork(jsPath, args, options) {
 
 function runAllTests() {
   runner.loadTestFiles()
-    .then(() => runner.runAll());
+    .then(
+      () => runner.runAll(),
+      err => vscode.window.showErrorMessage(`Failed to run tests due to ${err.message}`)
+    );
 }
 
 function selectAndRunTest() {
@@ -75,26 +78,30 @@ function selectAndRunTest() {
 
   vscode.window.showQuickPick(
     runner.loadTestFiles()
-      .then(tests => tests.map(test => ({
-        detail: path.relative(rootPath, test.file),
-        label: test.name,
-        test
-      })))
-      .catch(err => {
-        vscode.window.showErrorMessage(`Failed to find tests due to ${err.message}`);
-        console.error(err);
-        throw err;
-      })
+      .then(
+        tests => tests.map(test => ({
+          detail: path.relative(rootPath, test.file),
+          label: test.fullName,
+          test
+        })),
+        err => {
+          vscode.window.showErrorMessage(`Failed to find tests due to ${err.message}`);
+          throw err;
+        }
+      )
   )
   .then(entry => {
     if (!entry) { return; }
 
     runner.runTest(entry.test);
+  }, err => {
+    vscode.window.showErrorMessage(`Failed to run selected tests due to ${err.message}`);
   });
 }
 
 function runFailedTests() {
-  runner.runFailed();
+  runner.runFailed()
+    .catch(() => vscode.window.showErrorMessage(`Failed to rerun failed tests due to ${err.message}`));
 }
 
 function runTestsByPattern() {
@@ -113,5 +120,5 @@ function runTestsByPattern() {
     lastPattern = pattern;
 
     return runner.runWithGrep(pattern);
-  });
+  }, err => vscode.window.showErrorMessage(`Failed to run tests by pattern due to ${err.message}`));
 }

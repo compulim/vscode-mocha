@@ -7,60 +7,41 @@ const
   Promise = require('bluebird'),
   trimArray = require('../utils').trimArray;
 
-createMocha(process.argv[2])
+const
+  args = JSON.parse(process.argv[2]);
+
+createMocha(args.rootPath, args.options)
   .then(mocha => crawlTests(mocha.suite))
-  .then(tests => console.log(JSON.stringify(tests, null, 2)))
+  .then(tests => console.error(JSON.stringify(tests, null, 2)))
   .catch(err => {
-    console.error(JSON.stringify({
-      message: err.message,
-      stack: err.stack
-    }, null, 2));
+    console.error(err.stack);
 
     process.exit(-1);
   });
 
-function createMocha(workspaceRootPath) {
+function createMocha(rootPath, options) {
+  // const requireOptions = options.require || [];
+
+  // if (requireOptions) {
+  //   if (typeof requireOptions === 'string') {
+  //     global[requireOptions] = require(requireOptions);
+  //   } else {
+  //     requireOptions.forEach(name => {
+  //       global[name] = require(name);
+  //     });
+  //   }
+  // }
+
   return new Promise((resolve, reject) => {
-    const glob = new Glob('test/**/*.js', { cwd: workspaceRootPath }, (err, files) => {
+    const glob = new Glob('test/**/*.js', { cwd: rootPath, ignore: ['**/.git', '**/node_modules'] }, (err, files) => {
       if (err) { return reject(err); }
 
       try {
-        // Add mocha.json for options
+        const mocha = new Mocha(options);
 
-        const mocha = new Mocha({
-          require: 'should',
-          ui: 'bdd'
-        });
-
-        files.forEach(file => mocha.addFile(path.resolve(workspaceRootPath, file)));
+        files.forEach(file => mocha.addFile(path.resolve(rootPath, file)));
         mocha.loadFiles();
         resolve(mocha);
-      } catch (ex) {
-        reject(ex);
-      }
-    });
-  });
-}
-
-function findTests(workspaceRootPath) {
-  return new Promise((resolve, reject) => {
-    const glob = new Glob('test/**/*.js', { cwd: workspaceRootPath }, (err, files) => {
-      if (err) { return reject(err); }
-
-      try {
-        const mocha = new Mocha({
-          require: 'should',
-          ui: 'bdd'
-        });
-
-        files = files.map(file => path.resolve(workspaceRootPath, file));
-
-        // Add mocha.json for options
-
-        files.forEach(file => mocha.addFile(file));
-
-        mocha.loadFiles();
-        resolve(crawlTests(mocha.suite));
       } catch (ex) {
         reject(ex);
       }

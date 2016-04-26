@@ -18,6 +18,18 @@ if (Object.keys(options || {}).length) {
   console.log(`No Mocha options are configured. You can set it under File > Preferences > Workspace Settings.`);
 }
 
+// const requireOptions = options.require || [];
+
+// if (requireOptions) {
+//   if (typeof requireOptions === 'string') {
+//     global[requireOptions] = require(requireOptions);
+//   } else {
+//     requireOptions.forEach(name => {
+//       global[name] = require(name);
+//     });
+//   }
+// }
+
 const mocha = new Mocha(options);
 
 console.log();
@@ -40,9 +52,7 @@ if (grep) {
 
 mocha.reporter(CustomReporter);
 
-mocha.run(code => {
-  process.exit(code);
-});
+mocha.run();
 
 function indent(lines) {
   return lines.split('\n').map(line => `  ${line}`).join('\n');

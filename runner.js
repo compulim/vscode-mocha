@@ -2,8 +2,6 @@
 
 const
   escapeRegExp = require('escape-regexp'),
-  fork = require('./fork'),
-  Glob = require('glob').Glob,
   MochaShim = require('./mochashim'),
   path = require('path'),
   vscode = require('vscode');
@@ -14,40 +12,16 @@ function Runner() {
 }
 
 Runner.prototype.loadTestFiles = function () {
-  const rootPath = vscode.workspace.rootPath;
+  return MochaShim.findTests(vscode.workspace.rootPath)
+    .then(tests => {
+      this.tests = tests;
 
-  return (
-    fork(
-      path.resolve(module.filename, '../worker/findtests.js'),
-      [ rootPath ],
-      { cwd: rootPath }
-    ).then(process => new Promise((resolve, reject) => {
-      const
-        stdout = [],
-        stderr = [];
-
-      process.stdout.on('data', data => stdout.push(data));
-      process.stderr.on('data', data => stderr.push(data));
-
-      process.on('exit', code => {
-        if (code) {
-          const errJSON = JSON.parse(Buffer.concat(stderr).toString());
-
-          const err = new Error(errJSON.message);
-
-          err.stack = errJSON.stack;
-
-          reject(err);
-        } else {
-          resolve((this.tests = JSON.parse(Buffer.concat(stdout).toString())));
-        }
-      });
-    }))
-  );
+      return tests;
+    });
 };
 
 Runner.prototype._runMocha = function (testFiles, grep) {
-  return MochaShim.run(testFiles, grep)
+  return MochaShim.runTests(dedupeStrings(testFiles), grep)
     .then(result => {
       this.lastRunResult = result;
 
@@ -77,7 +51,9 @@ Runner.prototype.runFailed = function () {
   const failed = ((this.lastRunResult || {}).failed || []);
 
   if (!failed.length) {
-    return vscode.window.showWarningMessage(`No tests failed in last run.`);
+    vscode.window.showWarningMessage(`No tests failed in last run.`);
+
+    return new Promise(resolve => resolve());
   } else {
     return this._runMocha(
       dedupeStrings(failed.map(test => test.file)),
