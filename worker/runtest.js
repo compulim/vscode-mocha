@@ -28,16 +28,14 @@ args.files.forEach(file => {
   mocha.addFile(file);
 });
 
-const greps = args.greps;
+const grep = args.grep;
 
-if (greps) {
-  const pattern = `^${greps.map(grep => `(${grep})`).join('|')}$`;
-
+if (grep) {
   console.log();
   console.log('Grep pattern:');
-  console.log('  ' + pattern);
+  console.log('  ' + grep);
 
-  greps && mocha.grep(new RegExp(pattern));
+  mocha.grep(new RegExp(grep, 'i'));
 }
 
 mocha.reporter(CustomReporter);

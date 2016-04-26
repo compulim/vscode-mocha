@@ -15,7 +15,9 @@ const
 const
   access = Promise.promisify(fs.access);
 
-let lastRunResult;
+let
+  lastPattern,
+  lastRunResult;
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -32,6 +34,10 @@ function activate(context) {
 
   subscriptions.push(vscode.commands.registerCommand('mocha.runFailedTests', function () {
     runFailedTests();
+  }));
+
+  subscriptions.push(vscode.commands.registerCommand('mocha.runTestsByPattern', function () {
+    runTestsByPattern();
   }));
 }
 
@@ -97,14 +103,14 @@ function findNodeJSPath() {
   });
 }
 
-function runMocha(testFiles, greps) {
+function runMocha(testFiles, grep) {
   return fork(
     path.resolve(module.filename, '../worker/runtest.js'),
     [
       JSON.stringify({
         files: testFiles,
         options: vscode.workspace.getConfiguration('mocha').options,
-        greps: greps
+        grep: grep
       })
     ]
   ).then(process => new Promise((resolve, reject) => {
@@ -132,9 +138,22 @@ function runMocha(testFiles, greps) {
         reject(err);
       })
       .on('exit', () => {
-        const jsonText = Buffer.concat(resultJSONBuffers).toString();
+        const
+          jsonText = Buffer.concat(resultJSONBuffers).toString();
 
-        resolve(jsonText && JSON.parse(jsonText));
+        let resultJSON;
+
+        try {
+          resultJSON = jsonText && JSON.parse(jsonText);
+
+          const numFailed = (resultJSON.failed || []).length;
+
+          numFailed && vscode.window.showWarningMessage(`There are ${numFailed} test(s) failing.`);
+        } catch (ex) {
+          console.error(ex);
+        }
+
+        resolve(resultJSON);
       });
   }));
 }
@@ -151,13 +170,6 @@ function runAllTests() {
       ).then(
         result => {
           lastRunResult = result;
-
-          const numFailed = (result.failed || []).length;
-
-          if (numFailed) {
-            vscode.window.showWarningMessage(`There are ${numFailed} test(s) failing.`);
-          }
-
           resolve();
         },
         err => reject(err)
@@ -190,7 +202,7 @@ function selectAndRunTest() {
     if (entry) {
       const test = entry.test;
 
-      runMocha([ test.filename ], [ test.name ])
+      runMocha([ test.filename ], `^${escapeRegExp(test.name)}$`)
         .then(
           result => {
             lastRunResult = result;
@@ -212,7 +224,15 @@ function runFailedTests() {
 
   runMocha(
     failedTests.map(test => test.filename),
-    failedTests.map(test => escapeRegExp(trimArray(test.suitePath).concat(test.name).join(' ')))
+    `^${
+      failedTests.map(test =>
+        `(${
+          escapeRegExp(
+            trimArray(test.suitePath).concat(test.name).join(' ')
+          )
+        }$)`
+      ).join('|')
+    }$`
   ).then(result => {
     lastRunResult = result;
   });
@@ -224,4 +244,36 @@ function trimArray(array) {
 
     return trimmed;
   }, []);
+}
+
+function runTestsByPattern() {
+  Promise.props({
+    pattern: vscode.window.showInputBox({
+      placeHolder: 'Regular expression',
+      prompt: 'Pattern of tests to run',
+      value: lastPattern || ''
+    }),
+    filenames: findTests(vscode.workspace.rootPath)
+      .then(tests => distinctStrings(tests.map(test => test.filename)))
+  }).then(props => {
+    const pattern = props.pattern;
+
+    if (!pattern) { return; }
+
+    lastPattern = pattern;
+
+    runMocha(
+      props.filenames,
+      props.pattern
+    ).then(result => {
+    });
+  });
+}
+
+function distinctStrings(array) {
+  const keys = {};
+
+  array.forEach(key => { keys[key] = 0; });
+
+  return Object.keys(keys);
 }

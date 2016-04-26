@@ -31,7 +31,8 @@
   "activationEvents": [
     "onCommand:mocha.runAllTests",
     "onCommand:mocha.selectAndRunTest",
-    "onCommand:mocha.runFailedTests"
+    "onCommand:mocha.runFailedTests",
+    "onCommand:mocha.runTestsByPattern"
   ],
   "main": "./extension",
   "contributes": {
@@ -47,6 +48,10 @@
       {
         "command": "mocha.runFailedTests",
         "title": "Mocha: Run failed tests"
+      },
+      {
+        "command": "mocha.runTestsByPattern",
+        "title": "Mocha: Run tests matching a pattern"
       }
     ],
     "configuration": {
