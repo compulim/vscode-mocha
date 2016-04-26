@@ -13,21 +13,6 @@ function Runner() {
   this.lastRunResult = null;
 }
 
-// function crawlTestFiles() {
-//   const rootPath = vscode.workspace.rootPath;
-
-//   return new Promise((resolve, reject) => {
-//     new Glob('test/**/*.js', { cwd: rootPath }, (err, files) => {
-//       if (err) {
-//         vscode.window.showErrorMessage(`Failed to find any tests files due to ${err.message}`);
-//         reject(err);
-//       } else {
-//         resolve(files.map(file => path.resolve(rootPath, file)));
-//       }
-//     });
-//   });
-// }
-
 Runner.prototype.loadTestFiles = function () {
   const rootPath = vscode.workspace.rootPath;
 

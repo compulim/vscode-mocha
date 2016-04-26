@@ -65,117 +65,9 @@ function fork(jsPath, args, options) {
   });
 }
 
-// function findTests(rootPath) {
-//   return fork(
-//     path.resolve(module.filename, '../worker/findtests.js'),
-//     [ rootPath ],
-//     { cwd: rootPath }
-//   ).then(process => new Promise((resolve, reject) => {
-//     const
-//       stdout = [],
-//       stderr = [];
-
-//     process.stdout.on('data', data => stdout.push(data));
-//     process.stderr.on('data', data => stderr.push(data));
-
-//     process.on('exit', code => {
-//       if (code) {
-//         const errJSON = JSON.parse(Buffer.concat(stderr).toString());
-
-//         const err = new Error(errJSON.message);
-
-//         err.stack = errJSON.stack;
-
-//         reject(err);
-//       } else {
-//         resolve(JSON.parse(Buffer.concat(stdout).toString()));
-//       }
-//     });
-//   }));
-// }
-
-// function findNodeJSPath() {
-//   return new Promise((resolve, reject) => {
-//     const paths = process.env.path.split(process.platform === 'win32' ? ';' : ':');
-
-//     Promise.some([].concat(
-//       paths.map(p => path.resolve(p, 'node')).map(p => access(p, fs.X_OK).then(() => p)),
-//       paths.map(p => path.resolve(p, 'node.exe')).map(p => access(p, fs.X_OK).then(() => p))
-//     ), 1)
-//       .spread(nodeJSPath => resolve(nodeJSPath))
-//       .catch(err => reject(err));
-//   });
-// }
-
-// function runMocha(testFiles, grep) {
-//   return fork(
-//     path.resolve(module.filename, '../worker/runtest.js'),
-//     [
-//       JSON.stringify({
-//         files: testFiles,
-//         options: vscode.workspace.getConfiguration('mocha').options,
-//         grep
-//       })
-//     ]
-//   ).then(process => new Promise((resolve, reject) => {
-//     const outputChannel = vscode.window.createOutputChannel('Mocha');
-
-//     outputChannel.clear();
-//     outputChannel.show();
-
-//     outputChannel.appendLine(`Running Mocha with Node.js at ${process.spawnfile}\n`);
-
-//     const resultJSONBuffers = [];
-
-//     process.stderr.on('data', data => {
-//       resultJSONBuffers.push(data);
-//     });
-
-//     process.stdout.on('data', data => {
-//       outputChannel.append(data.toString().replace(/\r/g, ''));
-//     });
-
-//     process
-//       .on('error', err => {
-//         vscode.window.showErrorMessage(`Failed to run test due to ${err.message}`);
-//         outputChannel.append(err.stack);
-//         reject(err);
-//       })
-//       .on('exit', () => {
-//         const
-//           jsonText = Buffer.concat(resultJSONBuffers).toString();
-
-//         let resultJSON;
-
-//         try {
-//           resultJSON = jsonText && JSON.parse(jsonText);
-
-//           const numFailed = (resultJSON.failed || []).length;
-
-//           numFailed && vscode.window.showWarningMessage(`There are ${numFailed} test(s) failing.`);
-//         } catch (ex) {
-//           console.error(ex);
-//         }
-
-//         resolve(resultJSON);
-//       });
-//   }));
-// }
-
 function runAllTests() {
   runner.loadTestFiles()
     .then(() => runner.runAll());
-
-  // const rootPath = vscode.workspace.rootPath;
-
-  // return findAllTestFiles()
-  //   .then(files => runMocha(files))
-  //   .then(
-  //     result => {
-  //       lastRunResult = result;
-  //       resolve(result);
-  //     }
-  //   );
 }
 
 function selectAndRunTest() {
@@ -205,47 +97,6 @@ function runFailedTests() {
   runner.runFailed();
 }
 
-// function runFailedTests() {
-//   const failedTests = (lastRunResult || {}).failed || [];
-
-//   if (!failedTests.length) {
-//     return vscode.window.showInformationMessage('There are no tests failed in last run.');
-//   }
-
-//   runMocha(
-//     failedTests.map(test => test.filename),
-//     `^${
-//       failedTests.map(test =>
-//         `(${
-//           escapeRegExp(
-//             trimArray(test.suitePath).concat(test.name).join(' ')
-//           )
-//         }$)`
-//       ).join('|')
-//     }$`
-//   ).then(result => {
-//     lastRunResult = result;
-//   });
-// }
-
-// function trimArray(array) {
-//   return (array || []).reduce((trimmed, item) => {
-//     item && trimmed.push(item);
-
-//     return trimmed;
-//   }, []);
-// }
-
-// function findAllTestFiles() {
-//   const rootPath = vscode.workspace.rootPath;
-
-//   return new Promise((resolve, reject) => {
-//     new Glob('test/**/*.js', { cwd: rootPath }, (err, files) => {
-//       err ? reject(err) : resolve(files.map(file => path.resolve(rootPath, file)));
-//     })
-//   });
-// }
-
 function runTestsByPattern() {
   return Promise.props({
     pattern: vscode.window.showInputBox({
@@ -264,11 +115,3 @@ function runTestsByPattern() {
     return runner.runWithGrep(pattern);
   });
 }
-
-// function distinctStrings(array) {
-//   const keys = {};
-
-//   array.forEach(key => { keys[key] = 0; });
-
-//   return Object.keys(keys);
-// }
