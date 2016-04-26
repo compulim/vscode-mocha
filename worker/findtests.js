@@ -4,16 +4,17 @@ const
   Glob = require('Glob').Glob,
   Mocha = require('mocha'),
   path = require('path'),
-  Promise = require('bluebird');
+  Promise = require('bluebird'),
+  trimArray = require('../utils').trimArray;
 
 createMocha(process.argv[2])
   .then(mocha => crawlTests(mocha.suite))
-  .then(tests => console.log(JSON.stringify(tests)))
+  .then(tests => console.log(JSON.stringify(tests, null, 2)))
   .catch(err => {
     console.error(JSON.stringify({
       message: err.message,
       stack: err.stack
-    }));
+    }, null, 2));
 
     process.exit(-1);
   });
@@ -78,11 +79,16 @@ function crawlTests(suite) {
       suite = entry.suite;
 
     tests = tests.concat(
-      (suite.tests || []).map(test => ({
-        name: test.fullTitle(),
-        suitePath: entry.path,
-        filename: suite.file
-      }))
+      (suite.tests || []).map(test => {
+        const name = test.title;
+
+        return {
+          name,
+          fullName: trimArray(entry.path).concat([ name ]).join(' '),
+          suitePath: entry.path,
+          file: suite.file
+        };
+      })
     );
 
     suites = suites.concat(
