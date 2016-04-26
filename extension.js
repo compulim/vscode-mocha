@@ -58,6 +58,8 @@ function fork(jsPath, args, options) {
     ))
   }), err => {
     vscode.window.showErrorMessage('Cannot find Node.js installation from environment variable');
+
+    throw err;
   });
 }
 
@@ -110,7 +112,7 @@ function runMocha(testFiles, grep) {
       JSON.stringify({
         files: testFiles,
         options: vscode.workspace.getConfiguration('mocha').options,
-        grep: grep
+        grep
       })
     ]
   ).then(process => new Promise((resolve, reject) => {
