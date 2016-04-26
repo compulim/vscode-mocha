@@ -17,15 +17,15 @@ You can run tests by:
 * One test that you pick from a list
 
 ### How it works
-By default, this extensions finds and runs all tests by searching for `test/**/*.js` under your workspace.
+By default, this extensions will discover tests by searching for `test/**/*.js` under your workspace.
 
-Because tests may requires a newer version of Node.js than the one running Visual Studio Code. Thus, this extension will attempt to find your installed Node.js and use it to run your tests. It search for the installed Node.js as indicated by environmental variable `PATH`. You can find the logic [here](https://github.com/compulim/vscode-mocha/blob/master/fork.js).
+Because your tests may requires a newer version of Node.js than the one powering Visual Studio Code, thus, this extension will attempt to find your installed Node.js and use it for your tests. It will search for the installed Node.js as indicated by environmental variable `PATH`. You can find the logic [here](https://github.com/compulim/vscode-mocha/blob/master/fork.js).
 
-When the test is being run, we will add `NODE_PATH` to point to your workspace `node_modules` folder to help resolving external modules.
+When the test is being run, we will add `NODE_PATH` to point to your workspace `node_modules` folder to help [resolving external modules](https://nodejs.org/api/modules.html#modules_loading_from_the_global_folders).
 
 ## Fit yourself
 
-No one shoe could fit everyone. Please help fitting this extension for your project. Please [file us](https://github.com/compulim/vscode-mocha/issues/new/) an issue if you think there is a better way to fit you and others.
+No one shoe could fit everyone. You may need to turn some switches on to fit your project. Please [file us](https://github.com/compulim/vscode-mocha/issues/new/) an issue if you think there is a better way to fit you and the others.
 
 ### Configuring Mocha options
 Under File > Preferences > Workspace Settings, you can configure [Mocha options](https://github.com/mochajs/mocha/blob/master/lib/mocha.js), e.g. run in "tdd" mode, detect/ignore leaks, etc.
@@ -72,7 +72,7 @@ Following commands are also supported:
 ## Change log
 * 0.1.1 (2016-04-27)
   * Feature: New settings - test files glob and ignore globs
-  * Feature: New settings - environment variables for finding/running tests
+  * Feature: New settings - environment variables for discovering and running tests
 * 0.1.0 (2016-04-26)
   * Feature: Run tests by grep pattern
   * Feature: Rerun failed tests
