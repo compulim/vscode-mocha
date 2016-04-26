@@ -32,9 +32,10 @@ To configure Mocha, you can set it under File > Preferences > Workspace Settings
 ```
 
 ## Change log
-* 0.0.2 (2016-04-26)
+* 0.1.0 (2016-04-26)
   * Feature: Run tests by grep pattern
   * Feature: Rerun failed tests
+  * Feature: Rerun last set of tests
   * Feature: Dump severe error to output channel
   * Fix: When selecting tests, it did not use Mocha options in workspace settings
 * 0.0.1 (2016-04-25)

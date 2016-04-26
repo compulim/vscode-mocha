@@ -32,7 +32,8 @@
     "onCommand:mocha.runAllTests",
     "onCommand:mocha.selectAndRunTest",
     "onCommand:mocha.runFailedTests",
-    "onCommand:mocha.runTestsByPattern"
+    "onCommand:mocha.runTestsByPattern",
+    "onCommand:mocha.runLastSetAgain"
   ],
   "main": "./extension",
   "contributes": {
@@ -52,6 +53,10 @@
       {
         "command": "mocha.runTestsByPattern",
         "title": "Mocha: Run tests matching a pattern"
+      },
+      {
+        "command": "mocha.runLastSetAgain",
+        "title": "Mocha: Run last set again"
       }
     ],
     "configuration": {

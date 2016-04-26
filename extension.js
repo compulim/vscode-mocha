@@ -41,6 +41,10 @@ function activate(context) {
   subscriptions.push(vscode.commands.registerCommand('mocha.runTestsByPattern', function () {
     runTestsByPattern();
   }));
+
+  subscriptions.push(vscode.commands.registerCommand('mocha.runLastSetAgain', function () {
+    runLastSetAgain();
+  }));
 }
 
 exports.activate = activate;
@@ -121,4 +125,9 @@ function runTestsByPattern() {
 
     return runner.runWithGrep(pattern);
   }, err => vscode.window.showErrorMessage(`Failed to run tests by pattern due to ${err.message}`));
+}
+
+function runLastSetAgain() {
+  runner.runLastSet()
+    .catch(() => vscode.window.showErrorMessage(`Failed to rerun last set due to ${err.message}`));
 }

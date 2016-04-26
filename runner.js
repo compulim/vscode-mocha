@@ -48,7 +48,7 @@ Runner.prototype.runTest = function (test) {
 };
 
 Runner.prototype.runFailed = function () {
-  const failed = ((this.lastRunResult || {}).failed || []);
+  const failed = (this.lastRunResult || {}).failed || [];
 
   if (!failed.length) {
     vscode.window.showWarningMessage(`No tests failed in last run.`);
@@ -58,6 +58,24 @@ Runner.prototype.runFailed = function () {
     return this._runMocha(
       dedupeStrings(failed.map(test => test.file)),
       `^${failed.map(test => `(${escapeRegExp(test.fullName)})`).join('|')}$`
+    )
+  }
+};
+
+Runner.prototype.runLastSet = function () {
+  const
+    failed = (this.lastRunResult || {}).failed || [],
+    passed = (this.lastRunResult || {}).passed || [],
+    set = failed.concat(passed);
+
+  if (!set.length) {
+    vscode.window.showWarningMessage(`No tests were ran.`);
+
+    return new Promise(resolve => resolve());
+  } else {
+    return this._runMocha(
+      dedupeStrings(set.map(test => test.file)),
+      `^${set.map(test => `(${escapeRegExp(test.fullName)})`).join('|')}$`
     )
   }
 };

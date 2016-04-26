@@ -14,7 +14,8 @@ function Reporter(runner) {
 
   const
     suitePath = [],
-    failed = [];
+    failed = [],
+    passed = [];
 
   runner
     .on('suite', suite => {
@@ -23,19 +24,26 @@ function Reporter(runner) {
     .on('suite end', () => {
       suitePath.pop();
     })
+    .on('pass', test => {
+      passed.push(toJS(suitePath, test));
+    })
     .on('fail', test => {
-      const name = test.title;
-
-      failed.push({
-        name,
-        fullName: trimArray(suitePath).concat([ name ]).join(' '),
-        suitePath: suitePath.slice(),
-        file: test.file
-      });
+      failed.push(toJS(suitePath, test));
     })
     .on('end', () => {
-      console.error(JSON.stringify({ failed }, null, 2));
+      console.error(JSON.stringify({ passed, failed }, null, 2));
     });
+}
+
+function toJS(suitePath, test) {
+  const name = test.title;
+
+  return {
+    name,
+    fullName: trimArray(suitePath).concat([ name ]).join(' '),
+    suitePath: suitePath.slice(),
+    file: test.file
+  };
 }
 
 utils.inherits(Reporter, Base);
