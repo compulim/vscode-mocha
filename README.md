@@ -1,6 +1,8 @@
 # Mocha
 Runs Mocha tests, all or selected. Then prints the result to an output window.
 
+This extension is inspired by [Node.js Tools for Visual Studio](https://github.com/Microsoft/nodejstools).
+
 ![Demo showing Mocha test result](https://raw.githubusercontent.com/compulim/vscode-mocha/master/demo.png)
 
 ## Usage
@@ -8,7 +10,45 @@ To run Mocha tests:
 * Bring up Command Palette (`F1`, or `Ctrl+Shift+P` on Windows and Linux, or `Shift+CMD+P` on OSX)
 * Type or select "Mocha: Run all tests"
 
-You can also create keyboard shortcut with JSON below.
+You can run tests by:
+* All tests in the workspace
+* All or failed tests in last run
+* Tests that match a Regular Expression
+* One test that you pick from a list
+
+### How it works
+By default, this extensions finds and runs all tests by searching for `test/**/*.js` under your workspace.
+
+Because tests may requires a newer version of Node.js than the one running Visual Studio Code. Thus, this extension will attempt to find your installed Node.js and use it to run your tests. It search for the installed Node.js as indicated by environmental variable `PATH`. You can find the logic [here](https://github.com/compulim/vscode-mocha/blob/master/fork.js).
+
+When the test is being run, we will add `NODE_PATH` to point to your workspace `node_modules` folder to help resolving external modules.
+
+## Fit yourself
+
+No one shoe could fit everyone. Please help fitting this extension for your project. Please [file us](https://github.com/compulim/vscode-mocha/issues/new/) an issue if you think there is a better way to fit you and others.
+
+### Configuring Mocha options
+Under File > Preferences > Workspace Settings, you can configure [Mocha options](https://github.com/mochajs/mocha/blob/master/lib/mocha.js), e.g. run in "tdd" mode, detect/ignore leaks, etc.
+
+```
+//-------- Mocha options --------
+
+// Mocha: Options to run Mocha
+"mocha.options": {},
+
+// Mocha: Glob to search for test files
+"mocha.files.glob": "test/**/*.js",
+
+// Mocha: Globs to ignore when searching for test files
+"mocha.files.ignore": [
+  "**/.git/**/*",
+  "**/node_modules/**/*"
+],
+```
+
+### Setting a keyboard shortcut
+
+To quickly run tests, you can create a keyboard shortcut under File > Preferences > Keyboard Shortcuts. For example, the following JSON will run all tests with `CTRL+K` followed by `R` key.
 ```
 {
   "key": "ctrl+k r",
@@ -16,22 +56,7 @@ You can also create keyboard shortcut with JSON below.
 }
 ```
 
-## How it works
-This extensions finds and runs all test at `test/**/*.js`.
-
-All tests will run under installed Node.js as indicated by environmental variable `PATH`.
-
-## Configure Mocha
-To configure Mocha, you can set it under File > Preferences > Workspace Settings. For example, the following JSON will set your Mocha to run in TDD mode.
-```
-{
-  "mocha.options": {
-    "ui": "tdd"
-  }
-}
-```
-
-## Commands
+Following commands are also supported:
 
 | Command | Title |
 |---------|-------------|
@@ -42,6 +67,8 @@ To configure Mocha, you can set it under File > Preferences > Workspace Settings
 | `mocha.selectAndRunTest` | Mocha: Select and run a test |
 
 ## Change log
+* 0.1.1 (2016-04-27)
+  * Feature: Configurable test files glob in workspace settings
 * 0.1.0 (2016-04-26)
   * Feature: Run tests by grep pattern
   * Feature: Rerun failed tests
@@ -52,7 +79,7 @@ To configure Mocha, you can set it under File > Preferences > Workspace Settings
   * First public release
 
 ## Contributions
-Love this extension? [Star](https://github.com/compulim/vscode-mocha/stargazers) us!
+Love this extension? [Star](https://github.com/compulim/vscode-mocha/stargazers) us and rate us!
 
 Want to make this extension even more awesome? [Send us your wish](https://github.com/compulim/vscode-mocha/issues/new/).
 
