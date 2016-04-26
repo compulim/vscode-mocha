@@ -44,6 +44,9 @@ Under File > Preferences > Workspace Settings, you can configure [Mocha options]
   "**/.git/**/*",
   "**/node_modules/**/*"
 ],
+
+// Mocha: Environment variables to run your tests
+"mocha.env": {},
 ```
 
 ### Setting a keyboard shortcut
@@ -68,7 +71,8 @@ Following commands are also supported:
 
 ## Change log
 * 0.1.1 (2016-04-27)
-  * Feature: Configurable test files glob in workspace settings
+  * Feature: New settings - test files glob and ignore globs
+  * Feature: New settings - environment variables for finding/running tests
 * 0.1.0 (2016-04-26)
   * Feature: Run tests by grep pattern
   * Feature: Rerun failed tests

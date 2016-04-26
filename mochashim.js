@@ -7,6 +7,12 @@ const
   Promise = require('bluebird'),
   vscode = require('vscode');
 
+function envWithNodePath(rootPath) {
+  return Object.assign({
+    NODE_PATH: `${rootPath}${path.sep}node_modules`
+  }, config.env());
+}
+
 function runTests(testFiles, grep) {
   const rootPath = vscode.workspace.rootPath;
 
@@ -21,9 +27,7 @@ function runTests(testFiles, grep) {
       })
     ],
     {
-      env: {
-        NODE_PATH: rootPath
-      }
+      env: envWithNodePath(rootPath)
     }
   ).then(process => new Promise((resolve, reject) => {
     const outputChannel = vscode.window.createOutputChannel('Mocha');
@@ -85,9 +89,7 @@ function findTests(rootPath) {
       })
     ],
     {
-      env: {
-        NODE_PATH: `${rootPath}${path.sep}node_modules`
-      }
+      env: envWithNodePath(rootPath)
     }
   ).then(process => new Promise((resolve, reject) => {
     const

@@ -2,10 +2,18 @@
 
 const vscode = require('vscode');
 
+function getConfiguration() {
+  return vscode.workspace.getConfiguration('mocha');
+}
+
+exports.env = function env() {
+  return getConfiguration().env;
+};
+
 exports.options = function options() {
-  return vscode.workspace.getConfiguration('mocha').options;
+  return getConfiguration().options;
 };
 
 exports.files = function files() {
-  return vscode.workspace.getConfiguration('mocha').files;
+  return getConfiguration().files;
 };

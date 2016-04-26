@@ -76,6 +76,10 @@
           "default": ["**/.git/**/*", "**/node_modules/**/*"],
           "description": "Mocha: Globs to ignore when searching for test files",
           "type": ["string"]
+        },
+        "mocha.env": {
+          "default": {},
+          "description": "Mocha: Environment variables to run your tests"
         }
       }
     }

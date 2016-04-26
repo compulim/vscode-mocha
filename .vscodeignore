@@ -7,3 +7,4 @@ vsc-extension-quickstart.md
 *.psd
 *.gif
 demo.png
+**/debug.log
