@@ -31,6 +31,16 @@ To configure Mocha, you can set it under File > Preferences > Workspace Settings
 }
 ```
 
+## Commands
+
+| Command | Title |
+|---------|-------------|
+| `mocha.runAllTests` | Mocha: Run all tests |
+| `mocha.runFailedTests` | Mocha: Run failed tests |
+| `mocha.runLastSetAgain` | Mocha: Run last set again |
+| `mocha.runTestsByPattern` | Mocha: Run tests matching a pattern |
+| `mocha.selectAndRunTest` | Mocha: Select and run a test |
+
 ## Change log
 * 0.1.0 (2016-04-26)
   * Feature: Run tests by grep pattern
