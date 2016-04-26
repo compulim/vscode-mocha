@@ -28,9 +28,18 @@ args.files.forEach(file => {
   mocha.addFile(file);
 });
 
-const grep = args.grep;
+const greps = args.greps;
 
-grep && mocha.grep(new RegExp(`^${escapeRegExp(grep)}$`));
+if (greps) {
+  const pattern = `^${greps.map(grep => `(${grep})`).join('|')}$`;
+
+  console.log();
+  console.log('Grep pattern:');
+  console.log('  ' + pattern);
+
+  greps && mocha.grep(new RegExp(pattern));
+}
+
 mocha.reporter(CustomReporter);
 
 mocha.run(code => {

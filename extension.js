@@ -4,6 +4,7 @@
 // Import the module and reference it with the alias vscode in your code below
 const
   ChildProcess = require('child_process'),
+  escapeRegExp = require('escape-regexp'),
   fs = require('fs'),
   Glob = require('glob').Glob,
   Mocha = require('mocha'),
@@ -96,14 +97,14 @@ function findNodeJSPath() {
   });
 }
 
-function runMocha(rootPath, testFiles, name) {
+function runMocha(testFiles, greps) {
   return fork(
     path.resolve(module.filename, '../worker/runtest.js'),
     [
       JSON.stringify({
         files: testFiles,
         options: vscode.workspace.getConfiguration('mocha').options,
-        grep: name
+        greps: greps
       })
     ]
   ).then(process => new Promise((resolve, reject) => {
@@ -146,12 +147,17 @@ function runAllTests() {
       if (err) { return reject(err); }
 
       runMocha(
-        rootPath,
         files.map(file => path.resolve(rootPath, file))
       ).then(
         result => {
-          console.log(result);
           lastRunResult = result;
+
+          const numFailed = (result.failed || []).length;
+
+          if (numFailed) {
+            vscode.window.showWarningMessage(`There are ${numFailed} test(s) failing.`);
+          }
+
           resolve();
         },
         err => reject(err)
@@ -184,7 +190,7 @@ function selectAndRunTest() {
     if (entry) {
       const test = entry.test;
 
-      runMocha(rootPath, [ test.filename ], test.name)
+      runMocha([ test.filename ], [ test.name ])
         .then(
           result => {
             lastRunResult = result;
@@ -198,15 +204,24 @@ function selectAndRunTest() {
 }
 
 function runFailedTests() {
-  const rootPath = vscode.workspace.rootPath;
+  const failedTests = (lastRunResult || {}).failed || [];
 
-  findTests(rootPath)
-    .then(tests => {
-      console.log(tests);
-    })
-    .catch(err => {
-      vscode.window.showErrorMessage(`Failed to find tests due to ${err.message}`);
-      console.error(err);
-      throw err;
-    })
+  if (!failedTests.length) {
+    return vscode.window.showInformationMessage('There are no tests failed in last run.');
+  }
+
+  runMocha(
+    failedTests.map(test => test.filename),
+    failedTests.map(test => escapeRegExp(trimArray(test.suitePath).concat(test.name).join(' ')))
+  ).then(result => {
+    lastRunResult = result;
+  });
+}
+
+function trimArray(array) {
+  return (array || []).reduce((trimmed, item) => {
+    item && trimmed.push(item);
+
+    return trimmed;
+  }, []);
 }
