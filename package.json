@@ -2,7 +2,7 @@
   "name": "vscode-mocha",
   "displayName": "Mocha",
   "description": "Runs Mocha tests",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "publisher": "Compulim",
   "engines": {
     "vscode": "^0.10.1"
