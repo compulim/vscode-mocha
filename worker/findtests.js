@@ -10,7 +10,7 @@ const
 const
   args = JSON.parse(process.argv[2]);
 
-createMocha(args.rootPath, args.options)
+createMocha(args.rootPath, args.options, args.files.glob, args.files.ignore)
   .then(mocha => crawlTests(mocha.suite))
   .then(tests => console.error(JSON.stringify(tests, null, 2)))
   .catch(err => {
@@ -19,7 +19,7 @@ createMocha(args.rootPath, args.options)
     process.exit(-1);
   });
 
-function createMocha(rootPath, options) {
+function createMocha(rootPath, options, glob, ignore) {
   // const requireOptions = options.require || [];
 
   // if (requireOptions) {
@@ -33,7 +33,7 @@ function createMocha(rootPath, options) {
   // }
 
   return new Promise((resolve, reject) => {
-    const glob = new Glob('test/**/*.js', { cwd: rootPath, ignore: ['**/.git', '**/node_modules'] }, (err, files) => {
+    new Glob(glob, { cwd: rootPath, ignore }, (err, files) => {
       if (err) { return reject(err); }
 
       try {

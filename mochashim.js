@@ -1,6 +1,7 @@
 'use strict';
 
 const
+  config = require('./config'),
   fork = require('./fork'),
   path = require('path'),
   Promise = require('bluebird'),
@@ -14,7 +15,7 @@ function runTests(testFiles, grep) {
     [
       JSON.stringify({
         files: testFiles,
-        options: vscode.workspace.getConfiguration('mocha').options,
+        options: config.options(),
         grep,
         rootPath
       })
@@ -75,7 +76,11 @@ function findTests(rootPath) {
     path.resolve(module.filename, '../worker/findtests.js'),
     [
       JSON.stringify({
-        options: vscode.workspace.getConfiguration('mocha').options,
+        options: config.options(),
+        files: {
+          glob: config.files().glob,
+          ignore: config.files().ignore
+        },
         rootPath
       })
     ],

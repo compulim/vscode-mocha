@@ -4,6 +4,7 @@
 // Import the module and reference it with the alias vscode in your code below
 const
   ChildProcess = require('child_process'),
+  config = require('./config'),
   escapeRegExp = require('escape-regexp'),
   fs = require('fs'),
   Glob = require('glob').Glob,
@@ -72,7 +73,14 @@ function fork(jsPath, args, options) {
 function runAllTests() {
   runner.loadTestFiles()
     .then(
-      () => runner.runAll(),
+      files => {
+        if (!files.length) {
+          return vscode.window.showWarningMessage('No tests were found.');
+        }
+
+        runner.runAll();
+      }
+    ).catch(
       err => vscode.window.showErrorMessage(`Failed to run tests due to ${err.message}`)
     );
 }
@@ -83,11 +91,18 @@ function selectAndRunTest() {
   vscode.window.showQuickPick(
     runner.loadTestFiles()
       .then(
-        tests => tests.map(test => ({
-          detail: path.relative(rootPath, test.file),
-          label: test.fullName,
-          test
-        })),
+        tests => {
+          if (!tests.length) {
+            vscode.window.showWarningMessage(`No tests were found.`);
+            throw new Error('no tests found');
+          }
+
+          return tests.map(test => ({
+            detail: path.relative(rootPath, test.file),
+            label: test.fullName,
+            test
+          }));
+        },
         err => {
           vscode.window.showErrorMessage(`Failed to find tests due to ${err.message}`);
           throw err;
@@ -97,9 +112,11 @@ function selectAndRunTest() {
   .then(entry => {
     if (!entry) { return; }
 
-    runner.runTest(entry.test);
-  }, err => {
-    vscode.window.showErrorMessage(`Failed to run selected tests due to ${err.message}`);
+    runner
+      .runTest(entry.test)
+      .catch(err => {
+        vscode.window.showErrorMessage(`Failed to run selected tests due to ${err.message}`);
+      });
   });
 }
 

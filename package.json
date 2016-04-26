@@ -65,7 +65,17 @@
       "properties": {
         "mocha.options": {
           "default": {},
-         "description": "Mocha: Options to run Mocha"
+          "description": "Mocha: Options to run Mocha"
+        },
+        "mocha.files.glob": {
+          "default": "test/**/*.js",
+          "description": "Mocha: Glob to search for test files",
+          "type": "string"
+        },
+        "mocha.files.ignore": {
+          "default": ["**/.git/**/*", "**/node_modules/**/*"],
+          "description": "Mocha: Globs to ignore when searching for test files",
+          "type": ["string"]
         }
       }
     }
