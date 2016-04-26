@@ -27,7 +27,7 @@ Runner.prototype._runMocha = function (testFiles, grep) {
 
       const numFailed = (result.failed || []).length;
 
-      numFailed && vscode.window.showWarningMessage(`There are ${numFailed} failed test${numFailed > 1 ? 's': ''}.`);
+      numFailed && vscode.window.showWarningMessage(`There are ${numFailed} test${numFailed > 1 ? 's': ''} failed.`);
     },
     err => {
       console.error(err);
